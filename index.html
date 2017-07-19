@@ -9,7 +9,8 @@
 		socket.emit('adduser', prompt("What's your name?"));
 	});
 
-	
+
+
 	socket.on('updatechat', function (username, data) {
 		$('#conversation').append('<b>'+username + ':</b> ' + data + '<br>');
 	});
@@ -41,12 +42,21 @@
 			socket.emit('sendchat', message);
 		});
 
-		$('#roomname').click(function(){
-			var roomname = $('#roomdata').val();
-			
+	
+	$('#droom').click( function() {
+			var message = $('#room').val();
+			$('#room').val('');
+		
+			socket.emit('room', message);
 		});
 
-	
+	$('#room').keypress(function(e) {
+			if(e.which == 13) {
+				$(this).blur();
+				$('#room').focus().click();
+			}
+		});
+
 		$('#data').keypress(function(e) {
 			if(e.which == 13) {
 				$(this).blur();
@@ -59,8 +69,8 @@
 <div style="float:left;width:100px;border-right:1px solid black;height:300px;padding:10px;overflow:scroll-y;">
 	<b>ROOMS</b><br>
 	
-	<input id="data"/ style="width:100px;"><br>
-	<input type="button" id="sendroom" value = "join/create"/>
+	<input id="room"/ style="width:100px;"><br>
+	<input type="button" id="room" value = "create"/>
 
 
 

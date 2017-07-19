@@ -8,14 +8,14 @@ server.listen(8080);
 
 
 app.get('/', function (req, res) {
-  res.sendfile(__dirname + '/index.html');
+  res.sendFile(__dirname + '/index.html');
 });
 
 
 var usernames = {};
 
 
-var rooms = ['room1','room2','room3'];
+var rooms = ['room1','room2','room3', 'abc'];
 
 io.sockets.on('connection', function (socket) {
 	
@@ -35,6 +35,8 @@ io.sockets.on('connection', function (socket) {
 		socket.broadcast.to('room1').emit('updatechat', 'SERVER', username + ' has connected to this room');
 		socket.emit('updaterooms', rooms, 'room1');
 	});
+
+	
 	
 	
 	socket.on('sendchat', function (data) {
@@ -42,6 +44,10 @@ io.sockets.on('connection', function (socket) {
 		io.sockets.in(socket.room).emit('updatechat', socket.username, data);
 	});
 
+	socket.on('room', function(data){
+		rooms.push(data);
+		rooms.push(room);
+	});
 	
 	socket.on('switchRoom', function(newroom){
 		socket.leave(socket.room);
