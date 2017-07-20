@@ -3,19 +3,14 @@
 <script>
 	var socket = io.connect('http://localhost:8080');
 
-	
 	socket.on('connect', function(){
-		
 		socket.emit('adduser', prompt("What's your name?"));
 	});
-
-
 
 	socket.on('updatechat', function (username, data) {
 		$('#conversation').append('<b>'+username + ':</b> ' + data + '<br>');
 	});
 
-	
 	socket.on('updaterooms', function(rooms, current_room) {
 		$('#rooms').empty();
 		$.each(rooms, function(key, value) {
@@ -34,16 +29,11 @@
 	
 	
 	$(function(){
-		
 		$('#datasend').click( function() {
 			var message = $('#data').val();
 			$('#data').val('');
-		
 			socket.emit('sendchat', message);
 		});
-
-	
-	
 
 		$('#data').keypress(function(e) {
 			if(e.which == 13) {
@@ -52,14 +42,16 @@
 			}
 		});
 
-		$('#room').click(function(){
+		$('#roombutton').click(function(){
 			var room = $('#room').val();
 			socket.emit('room',room);
+			console.log('clicked');
 		});
+
 		$('#room').keypress(function(e) {
 			if(e.which == 13) {
 				$(this).blur();
-				$('#room').focus().click();
+				$('#roombutton').focus().click();
 			}
 		});
 
@@ -69,14 +61,8 @@
 </script>
 <div style="float:left;width:100px;border-right:1px solid black;height:300px;padding:10px;overflow:scroll-y;">
 	<b>ROOMS</b><br>
-	
-	<input id="room"/ style="width:100px;"><br>
-	<input type="button" id="rooom" value = "create"/>
-
-
-
-
-
+		<input id="room"/ style="width:100px;"><br>
+		<input type="button" id="roombutton" value = "create/join"/>
 	<div id="rooms"></div>
 </div>
 <div style="float:left;width:300px;height:250px;overflow:scroll-y;padding:10px;">
