@@ -11,7 +11,7 @@ app.get('/', function (req, res) {
 });
 
 var usernames = {};
-
+var durdur=['hi','hu'];
 var rooms = ['room1','room2','room3', 'abc'];
 
 io.sockets.on('connection', function (socket) {

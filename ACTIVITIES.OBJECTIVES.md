@@ -1,4 +1,5 @@
 19.07.2017 - created project structure
 20.07.2017 - created support for multiple rooms
            - user can create and join different rooms
-		   - cleaned up code
+	   - cleaned up code
+	   - users can no longer duplicate rooms, screen cleared each time a new room is joined

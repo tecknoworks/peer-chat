@@ -23,6 +23,10 @@
 		});
 	});
 
+	function clearBox(elementID){
+    document.getElementById(elementID).innerHTML = "";
+	}
+
 	function switchRoom(room){
 		socket.emit('switchRoom', room);
 	}
@@ -62,8 +66,9 @@
 <div style="float:left;width:100px;border-right:1px solid black;height:300px;padding:10px;overflow:scroll-y;">
 	<b>ROOMS</b><br>
 		<input id="room"/ style="width:100px;"><br>
-		<input type="button" id="roombutton" value = "create/join"/>
-	<div id="rooms"></div>
+		<input type="button" id="roombutton" value = "create/join"/ onclick="clearBox('conversation')">
+	<div id="rooms" ></div>
+	
 </div>
 <div style="float:left;width:300px;height:250px;overflow:scroll-y;padding:10px;">
 	<div id="conversation"></div>
