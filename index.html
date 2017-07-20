@@ -43,19 +43,7 @@
 		});
 
 	
-	$('#droom').click( function() {
-			var message = $('#room').val();
-			$('#room').val('');
-		
-			socket.emit('room', message);
-		});
-
-	$('#room').keypress(function(e) {
-			if(e.which == 13) {
-				$(this).blur();
-				$('#room').focus().click();
-			}
-		});
+	
 
 		$('#data').keypress(function(e) {
 			if(e.which == 13) {
@@ -63,6 +51,19 @@
 				$('#datasend').focus().click();
 			}
 		});
+
+		$('#room').click(function(){
+			var room = $('#room').val();
+			socket.emit('room',room);
+		});
+		$('#room').keypress(function(e) {
+			if(e.which == 13) {
+				$(this).blur();
+				$('#room').focus().click();
+			}
+		});
+
+		
 	});
 
 </script>
@@ -70,7 +71,7 @@
 	<b>ROOMS</b><br>
 	
 	<input id="room"/ style="width:100px;"><br>
-	<input type="button" id="room" value = "create"/>
+	<input type="button" id="rooom" value = "create"/>
 
 
 

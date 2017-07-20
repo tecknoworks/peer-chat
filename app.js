@@ -36,6 +36,33 @@ io.sockets.on('connection', function (socket) {
 		socket.emit('updaterooms', rooms, 'room1');
 	});
 
+
+	socket.on('room',function(newroom){
+
+		var i;
+		for (i=0; i<rooms.lenght; i++)
+			if (rooms[i]== newroom)
+				console.log('room exists');
+			else
+			{
+		rooms.push(newroom);
+		
+		socket.room = newroom;
+		
+
+		socket.leave(socket.room);
+		socket.join(newroom);
+		socket.emit('updatechat', 'SERVER', 'you have connected to '+ newroom);
+		
+		socket.broadcast.to(socket.room).emit('updatechat', 'SERVER', socket.username+' has left this room');
+		
+		socket.room = newroom;
+		socket.broadcast.to(newroom).emit('updatechat', 'SERVER', socket.username+' has joined this room');
+		socket.emit('updaterooms', rooms, newroom);
+	}
+
+	});
+
 	
 	
 	
@@ -44,10 +71,7 @@ io.sockets.on('connection', function (socket) {
 		io.sockets.in(socket.room).emit('updatechat', socket.username, data);
 	});
 
-	socket.on('room', function(data){
-		rooms.push(data);
-		rooms.push(room);
-	});
+
 	
 	socket.on('switchRoom', function(newroom){
 		socket.leave(socket.room);
