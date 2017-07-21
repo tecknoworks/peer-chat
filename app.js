@@ -16,18 +16,23 @@ var rooms = ['Lobby 1','Lobby 2','Lobby 3',];
 io.sockets.on('connection', function (socket) {
 		socket.on('adduser', function(username){
 		socket.username = username;
-		socket.room = 'room1';
+		socket.room = 'Lobby 1';
 		usernames[username] = username;
-		socket.join('room1');
-		socket.emit('updatechat', 'SERVER', 'you have connected to room1');
-		socket.broadcast.to('room1').emit('updatechat', 'SERVER', username + ' has connected to this room');
-		socket.emit('updaterooms', rooms, 'room1');
+		socket.join('Lobby 1');
+		socket.emit('updatechat', 'SERVER', 'you have connected to the first lobby room');
+		socket.broadcast.to('Lobby 1').emit('updatechat', 'SERVER', username + ' has connected to this room');
+		socket.emit('updaterooms', rooms, 'Lobby 1');
+
 	});
 
 	socket.on('room',function(newroom){
 		var i;
 		var roomFound=false;
 		console.log(newroom);
+		if (newroom=="")
+			console.log("cannot join empty room");
+		else
+		{
 		for (i=0;i<rooms.length;i++){
 			if (rooms[i] == newroom)
 				roomFound=true;
@@ -55,7 +60,7 @@ io.sockets.on('connection', function (socket) {
 			socket.broadcast.to(newroom).emit('updatechat', 'SERVER', socket.username+' has joined this room');
 			socket.emit('updaterooms', rooms, newroom);
 		}
-		
+		}
 	});
 
 	socket.on('sendchat', function (data) {
