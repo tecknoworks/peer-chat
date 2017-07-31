@@ -6,6 +6,8 @@ var express = require('express')
 
 server.listen(8080);
 
+
+
 app.get('/', function (req, res) {
   res.sendFile(__dirname + '/index.html');
 });
@@ -83,4 +85,7 @@ io.sockets.on('connection', function (socket) {
 		socket.broadcast.emit('updatechat', 'SERVER', socket.username + ' has disconnected');
 		socket.leave(socket.room);
 	});
+
+	 
+
 });
