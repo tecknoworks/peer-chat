@@ -4,8 +4,7 @@ var express = require('express')
   , server = http.createServer(app)
   , io = require('socket.io').listen(server);
 
-
-
+var Peer = require('simple-peer')
 
 server.listen(8080);
 
@@ -27,6 +26,9 @@ io.sockets.on('connection', function (socket) {
 		socket.emit('updatechat', 'SERVER', 'you have connected to the first lobby room');
 		socket.broadcast.to('Lobby 1').emit('updatechat', 'SERVER', username + ' has connected to this room');
 		socket.emit('updaterooms', rooms, 'Lobby 1');
+		
+
+  		
 
 	});
 
@@ -80,6 +82,11 @@ io.sockets.on('connection', function (socket) {
 		socket.room = newroom;
 		socket.broadcast.to(newroom).emit('updatechat', 'SERVER', socket.username+' has joined this room');
 		socket.emit('updaterooms', rooms, newroom);
+		var peer1 = new SimplePeer({ initiator: true })
+		var peer2 = new SimplePeer()
+
+		
+
 	});
 	
 	socket.on('disconnect', function(){
@@ -88,6 +95,10 @@ io.sockets.on('connection', function (socket) {
 		socket.broadcast.emit('updatechat', 'SERVER', socket.username + ' has disconnected');
 		socket.leave(socket.room);
 	});
+
+
+
+
 
 	 
 

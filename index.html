@@ -1,11 +1,13 @@
 <script src="/socket.io/socket.io.js"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js"></script>
 
+
 <script>
 	var socket = io.connect('http://localhost:8080');
 
 	socket.on('connect', function(){
 		socket.emit('adduser', prompt("What's your name?"));
+
 	});
 
 	socket.on('updatechat', function (username, data) {
@@ -14,6 +16,7 @@
 
 	socket.on('updaterooms', function(rooms, current_room) {
 		$('#rooms').empty();
+
 		$.each(rooms, function(key, value) {
 			if(value == current_room){
 				$('#rooms').append('<div>' + value + '</div>');
@@ -21,7 +24,10 @@
 			else {
 				$('#rooms').append('<div><a href="#" onclick="switchRoom(\''+value+'\')">' + value + '</a></div>');
 			}
+
 		});
+		
+
 	});
 
 	function clearBox(elementID){
@@ -31,7 +37,8 @@
 	function switchRoom(room){
 		socket.emit('switchRoom', room);
 	}
-	
+
+
 	
 	$(function(){
 		$('#datasend').click( function() {
@@ -74,7 +81,7 @@
 
 </div>
 <div style="float:left;width:300px;height:250px;overflow:scroll-y;padding:10px;">
-	<div id="conversation" style= "border: 1px solid black; width:1000px; height:800px; overflow: scroll;"></div>
+	<div id="conversation" style= "border: 1px solid black; width:800px; height:800px; overflow: scroll;"></div>
 	
 		<input id="data" style="width:200px;" />
 		<input type="button" id="datasend" value="send"  />
@@ -83,67 +90,11 @@
 
   
 
-<div id="container"></div>
-        <script src="js/discoveryClient.js"></script>
 
-        <script type="text/javascript" charset="utf-8">
-            var cm;var pinger;
-  document.addEventListener("DOMContentLoaded", init);
-function init() {
-    let container = document.getElementById('container');
-    navigator.mediaDevices.getUserMedia({ video: true, audio: true }).then(function(stream) {
-        initRTC(stream);
-    }).catch(function(err) {
-        console.log(err)
-        initRTC(false);
-    });
-    function findOrCreateVideo(id) {
-        var v = document.getElementById(id);
-        if (v === null) {
-            v = document.createElement('video');
-            v.setAttribute('id', id);
-            v.setAttribute('class', 'item');
-            container.appendChild(v);
-        }
-        return v;
-    }
-    function handlePeer(peer) {
-        peer.on('connect', function () {
-            console.log('connect');
-            findOrCreateVideo(peer._id);
-        });
-        peer.on('data', function (stuff) {
-            console.log(stuff);
-        });
-        peer.on('stream', function (stuff) {
-            console.log('stream');
-            var v = findOrCreateVideo(peer._id);
-            v.src = window.URL.createObjectURL(stuff);
-            v.play();
-        });
-        peer.on('error', function (stuff) {
-            console.log(stuff);
-        });
-        peer.on('close', function () {
-            console.log('close');
-            var v = document.getElementById(peer._id);
-            if (v !== null) {
-                container.removeChild(v);
-            }
-        });
-    }
-    function initRTC(stream) {
-        var video = findOrCreateVideo('own');
-        if (stream) {
-            video.src = window.URL.createObjectURL(stream)
-            video.play()
-        }
-        var roomId = discoveryClient.getParameterByName('id') || 'conf-default';
-        cm = new discoveryClient.Mesh(handlePeer);
-        cm.connect('/', roomId, stream);
-        
-    }
-}
-</script>
+</div>
+<div style="float:right ;width:300px;height:250px;overflow:scroll-y;padding:10px;">
+<b> Cameras</b>
+
+
 </div>
 
