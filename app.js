@@ -4,9 +4,9 @@ var express = require('express')
   , server = http.createServer(app)
   , io = require('socket.io').listen(server);
 
-var Peer = require('simple-peer')
-
-server.listen(8080);
+var socket = 8080;
+server.listen(socket);
+console.log('listening on: ', socket);
 
 
 app.get('/', function (req, res) {
@@ -15,10 +15,14 @@ app.get('/', function (req, res) {
 
 
 var usernames = {};
-var rooms = ['Lobby 1','Lobby 2','Lobby 3',];
+var rooms = ['Lobby 1','Lobby 2','Lobby 3'];
+var map = {};
+map['Lobby 1']=[];
+map['Lobby 2']=[];
+map['Lobby 3']=[];
 
 io.sockets.on('connection', function (socket) {
-		socket.on('adduser', function(username){
+		socket.on('adduser', function(username) {
 		socket.username = username;
 		socket.room = 'Lobby 1';
 		usernames[username] = username;
@@ -26,47 +30,75 @@ io.sockets.on('connection', function (socket) {
 		socket.emit('updatechat', 'SERVER', 'you have connected to the first lobby room');
 		socket.broadcast.to('Lobby 1').emit('updatechat', 'SERVER', username + ' has connected to this room');
 		socket.emit('updaterooms', rooms, 'Lobby 1');
-		
+		});
 
-  		
-
-	});
-
-	socket.on('room',function(newroom){
+	socket.on('room',function(newroom) {
 		var i;
 		var roomFound=false;
+		var key;
 		console.log(newroom);
-		if (newroom=="")
-			console.log("cannot join empty room");
-		else
-		{
-		for (i=0;i<rooms.length;i++){
-			if (rooms[i] == newroom)
-				roomFound=true;
+		if (newroom=="") {
+			//console.log("cannot join empty room");
 		}
-		if (roomFound==false)
-		{
+		else {	
+			for (key in map) {
+				if (key == newroom) {
+					roomFound=true;
+					console.log(roomFoud);
+				}
+			}
+		if (roomFound==false) {
+			console.log(roomFound);
 			rooms.push(newroom);
-			socket.room = newroom;
+			map[newroom]=[];
+			map[newroom].push(socket);
+			for (key in Object.keys(map)) {
+				for (roomcheck in map[key]) {
+					if (map[key][roomcheck]==socket.room) {
+						delete map[key][roomcheck];
+				}	
+				delete usernames[socket.username];
+				io.sockets.emit('updateusers', usernames);
+				socket.broadcast.emit('updatechat', 'SERVER', socket.username + ' has disconnected');
+				socket.leave(socket.room);
+			}
+		}
+			//console.log(map);
+			//console.log(map[newroom]);
+			socket.room = map[newroom];
 			socket.leave(socket.room);
-			socket.join(newroom);
+			socket.join(map[newroom]);
 			socket.emit('updatechat', 'SERVER', 'you have connected to '+ newroom);
 			socket.broadcast.to(socket.room).emit('updatechat', 'SERVER', socket.username+' has left this room');
-			socket.room = newroom;
-			socket.broadcast.to(newroom).emit('updatechat', 'SERVER', socket.username+' has joined this room');
-			socket.emit('updaterooms', rooms, newroom);
+			socket.room = map[newroom];
+			socket.broadcast.to(newroom).emit('updatechat', 'SERVER', socket.username+' has joined this room');	
+			socket.emit('updaterooms', rooms  );
+			console.log("6");
+
 		}
-		else
-		{
-			socket.room = newroom;
-			socket.leave(socket.room);
-			socket.join(newroom);
-			socket.emit('updatechat', 'SERVER', 'you have connected to '+ newroom);
-			socket.broadcast.to(socket.room).emit('updatechat', 'SERVER', socket.username+' has left this room');
-			socket.room = newroom;
-			socket.broadcast.to(newroom).emit('updatechat', 'SERVER', socket.username+' has joined this room');
-			socket.emit('updaterooms', rooms, newroom);
+			else {	
+				map[newroom].push(socket);
+				//console.log(map);
+				for (key in Object.keys(map)) {
+					for (roomcheck in map[key]) {
+						if (map[key][roomcheck]==socket.room) {
+							delete map[key][roomcheck];
+				}	
+				delete usernames[socket.username];
+				io.sockets.emit('updateusers', usernames);
+				socket.broadcast.emit('updatechat', 'SERVER', socket.username + ' has disconnected');
+				socket.leave(socket.room);
+			}
 		}
+				socket.room = map[newroom];
+				socket.leave(socket.room);
+				socket.join(map[newroom]);
+				socket.emit('updatechat', 'SERVER', 'you have connected to '+ newroom);
+				socket.broadcast.to(socket.room).emit('updatechat', 'SERVER', socket.username+' has left this room');
+				socket.room = map[newroom];
+				socket.broadcast.to(newroom).emit('updatechat', 'SERVER', socket.username+' has joined this room');
+				socket.emit('updaterooms', rooms);
+			}
 		}
 	});
 
@@ -74,32 +106,43 @@ io.sockets.on('connection', function (socket) {
 		io.sockets.in(socket.room).emit('updatechat', socket.username, data);
 	});
 
-	socket.on('switchRoom', function(newroom){
+	socket.on('switchRoom', function(newroom) {
+		map[newroom].push(socket);
+		//console.log(map);
+		for (key in Object.keys(map)) {
+			for (roomcheck in map[key]) {
+				if (map[key][roomcheck]==socket.room) {
+					delete map[key][roomcheck];
+				}	
+				delete usernames[socket.username];
+				io.sockets.emit('updateusers', usernames);
+				socket.broadcast.emit('updatechat', 'SERVER', socket.username + ' has disconnected');
+				socket.leave(socket.room);
+			}
+		}
+		socket.room=map[newroom];
 		socket.leave(socket.room);
-		socket.join(newroom);
+		socket.join(map[newroom]);
 		socket.emit('updatechat', 'SERVER', 'you have connected to '+ newroom);
 		socket.broadcast.to(socket.room).emit('updatechat', 'SERVER', socket.username+' has left this room');
-		socket.room = newroom;
+		socket.room = map[newroom];
 		socket.broadcast.to(newroom).emit('updatechat', 'SERVER', socket.username+' has joined this room');
-		socket.emit('updaterooms', rooms, newroom);
-		var peer1 = new SimplePeer({ initiator: true })
-		var peer2 = new SimplePeer()
-
-		
-
+		socket.emit('updaterooms', rooms);
 	});
 	
-	socket.on('disconnect', function(){
-		delete usernames[socket.username];
-		io.sockets.emit('updateusers', usernames);
-		socket.broadcast.emit('updatechat', 'SERVER', socket.username + ' has disconnected');
-		socket.leave(socket.room);
+	socket.on('disconnect', function() {
+		var key;
+		var roomcheck;
+		for (key in Object.keys(map)) {
+			for (roomcheck in map[key]) {
+				if (map[key][roomcheck]==socket.room) {
+					delete map[key][roomcheck];
+				}	
+				delete usernames[socket.username];
+				io.sockets.emit('updateusers', usernames);
+				socket.broadcast.emit('updatechat', 'SERVER', socket.username + ' has disconnected');
+				socket.leave(socket.room);
+			}
+		}
 	});
-
-
-
-
-
-	 
-
 });
